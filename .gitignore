@@ -1,0 +1,15 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Raw FlyWire CSVs (не нужны для прототипа)
+data/connections.csv.gz
+data/classification.csv.gz
+data/coordinates.csv.gz
+data/neurons.csv.gz
+
+# OS / editor junk
+.DS_Store
+.vscode/
+.idea/
