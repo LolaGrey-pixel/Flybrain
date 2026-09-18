@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>FlyBrain</title>
+    <link rel="stylesheet" type="text/css" href="./css/main.css?v=17">
+</head>
+
+<body>
+    <div id="toolbar">
+        <div class="toolbar-left">
+            <button class="tool-btn sidebar-toggle" id="sidebarToggle" aria-label="Toggle panel">&#9776;</button>
+            <button class="tool-btn active" data-tool="feed">Feed</button>
+            <button class="tool-btn" data-tool="touch">Touch</button>
+            <button class="tool-btn" data-tool="air">Air</button>
+            <button class="tool-btn" data-tool="light" id="lightBtn">Light: Bright</button>
+            <button class="tool-btn" data-tool="temp" id="tempBtn">Temp: Neutral</button>
+            <button class="tool-btn" id="brain3dBtn" aria-pressed="false">Brain 3D</button>
+            <button class="tool-btn" id="activityToggle">Activity</button>
+            <button class="tool-btn" id="learnBtn">Learn</button>
+            <button class="tool-btn" id="helpBtn">?</button>
+            <button class="tool-btn" id="liteBtn">Lite</button>
+        </div>
+        <div class="toolbar-right">
+            <span id="claudeStatus" class="claude-status" style="display:none;">
+                <span class="claude-dot"></span>
+                <span class="claude-status-text">AI</span>
+            </span>
+            <span class="toolbar-title">FlyBrain</span>
+            <span id="scaleIndicator" class="scale-indicator" style="display:none;"></span>
+            <img id="centerButton" src="./svg/center.svg" height="24" class="noselect toolbar-icon">
+            <img id="clearButton" src="./svg/clear.svg" height="24" class="noselect toolbar-icon">
+            <a href="https://github.com/snedea/flybrain">
+                <img id="githubButton" src="./svg/github.svg" class="noselect">
+            </a>
+        </div>
+    </div>
+    <div id="helpOverlay" class="help-overlay" style="display:none;">
+        <div class="help-overlay-header">
+            <span>Interaction Guide</span>
+            <button class="help-close-btn" id="helpCloseBtn">&times;</button>
+        </div>
+        <div class="help-item"><strong>Feed</strong> -- Click on the canvas to place food. The fly will seek and eat it when hungry.</div>
+        <div class="help-item"><strong>Touch</strong> -- Click on the fly to touch it. Location matters: head, thorax, abdomen, or leg each triggers different grooming. Tap 3+ times in 4 seconds for a pain response.</div>
+        <div class="help-item"><strong>Air</strong> -- Click and drag near the fly to blow wind. Drag distance controls wind strength.</div>
+        <div class="help-item"><strong>Light</strong> -- Cycles through Bright, Dim, and Dark. The fly exhibits phototaxis toward light.</div>
+        <div class="help-item"><strong>Temp</strong> -- Cycles through Neutral, Warm, and Cool. Warm makes the fly more active and avoidant. Cool makes it exploratory.</div>
+    </div>
+    <div id="left-panel">
+        <div id="connectome-panel">
+            <div class="connectome-header">
+                <span class="connectome-label">Connectome</span>
+                <button class="connectome-toggle-btn" id="connectomeToggleBtn" title="Toggle view (V)">Hide</button>
+            </div>
+            <div class="connectome-subtitle" id="connectomeSubtitle">Loading connectome...</div>
+            <div id="nodeHolder" class="connectome-grid"></div>
+            <div id="neuronTooltip" class="neuron-tooltip"></div>
+        </div>
+        <div id="drive-meters">
+            <div class="drive-row">
+                <span class="drive-label">State</span>
+                <span id="behaviorState" class="behavior-state">idle</span>
+            </div>
+            <div class="drive-row">
+                <span class="drive-label">Hunger</span>
+                <div class="drive-bar-bg"><div class="drive-bar" id="driveHunger"></div></div>
+            </div>
+            <div class="drive-row">
+                <span class="drive-label">Fear</span>
+                <div class="drive-bar-bg"><div class="drive-bar" id="driveFear"></div></div>
+            </div>
+            <div class="drive-row">
+                <span class="drive-label">Fatigue</span>
+                <div class="drive-bar-bg"><div class="drive-bar" id="driveFatigue"></div></div>
+            </div>
+            <div class="drive-row">
+                <span class="drive-label">Curiosity</span>
+                <div class="drive-bar-bg"><div class="drive-bar" id="driveCuriosity"></div></div>
+            </div>
+            <div class="drive-row">
+                <span class="drive-label">Groom</span>
+                <div class="drive-bar-bg"><div class="drive-bar" id="driveGroom"></div></div>
+            </div>
+        </div>
+    </div>
+    <div id="caretaker-sidebar" class="caretaker-sidebar">
+        <div class="caretaker-sidebar-header">
+            <span class="caretaker-sidebar-title">Activity</span>
+            <button class="caretaker-sidebar-close" id="caretaker-sidebar-close">&times;</button>
+        </div>
+        <div class="activity-feed" id="activity-feed-list"></div>
+        <div class="chat-section" id="chat-section">
+            <div class="chat-history" id="chat-history"></div>
+            <div class="chat-input-row">
+                <input type="text" class="chat-input" id="chat-input" placeholder="Ask about the fly..." autocomplete="off" />
+                <button class="chat-send-btn" id="chat-send-btn">Send</button>
+            </div>
+        </div>
+        <div class="analytics-section" id="analytics-section">
+            <div class="analytics-section-header">
+                <span class="analytics-section-title">Analytics</span>
+                <button class="analytics-toggle-btn" id="analytics-toggle">Hide</button>
+            </div>
+            <div class="analytics-content" id="analytics-content"></div>
+        </div>
+        <div class="calendar-section" id="calendar-section">
+            <div class="calendar-section-header">
+                <span class="calendar-section-title">Calendar</span>
+                <button class="calendar-toggle-btn" id="calendar-toggle">Hide</button>
+            </div>
+            <div class="calendar-content" id="calendar-content"></div>
+        </div>
+    </div>
+    <div id="drawer-backdrop" class="drawer-backdrop"></div>
+    <canvas id='canvas'></canvas>
+    <div id="zoom-controls" class="zoom-controls">
+        <button class="zoom-btn" id="zoomIn">+</button>
+        <button class="zoom-btn" id="zoomOut">&minus;</button>
+    </div>
+    <div id="education-panel" class="education-panel" style="display:none;">
+        <div class="education-panel-header">
+            <span class="education-panel-title">Brain Guide</span>
+            <button class="education-close-btn" id="education-close-btn">&times;</button>
+        </div>
+        <div class="education-content" id="education-content"></div>
+    </div>
+    <div id="brain3d-overlay" style="display:none;"></div>
+    <div id="brain3d-tooltip" style="display:none;"></div>
+    <!-- Three.js v0.128.0 (vendored) -- do NOT upgrade one without the other -->
+    <script src="./js/vendor/three.min.js"></script>
+    <script src="./js/vendor/OrbitControls.js"></script>
+    <script type="text/javascript" src="./js/constants.js?v=17"></script>
+    <script type="text/javascript" src="./js/connectome.js?v=17"></script>
+    <script type="text/javascript" src="./js/brain-worker-bridge-v4.js"></script>
+    <script type="text/javascript" src="./js/neuro-renderer.js?v=17"></script>
+    <script type="text/javascript" src="./js/fly-logic.js?v=17"></script>
+    <script type="text/javascript" src="./js/brain3d.js?v=17"></script>
+    <script type="text/javascript" src="./js/education.js?v=17"></script>
+    <script type="text/javascript" src="./js/main.js?v=17"></script>
+    <script type="text/javascript" src="./js/fisHKA-main-v4.js"></script>
+    <script type="text/javascript" src="./js/caretaker-renderer.js?v=17"></script>
+    <script type="text/javascript" src="./js/caretaker-sidebar.js?v=17"></script>
+    <script type="text/javascript" src="./js/caretaker-analytics.js?v=17"></script>
+    <script type="text/javascript" src="./js/caretaker-calendar.js?v=17"></script>
+    <script type="text/javascript" src="./js/caretaker-bridge.js?v=17"></script>
+    <div id="fishka-panel" style="position: fixed; top: 60px; right: 10px;
+         background: rgba(0,0,0,0.85); color: #0f0; padding: 10px;
+         font-family: monospace; font-size: 12px; border-radius: 5px;
+         width: 300px; z-index: 10000; border: 1px solid #0f0;"></div>
+</body>
+
+</html>
